@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@contentful/rich-text-react-renderer':
+    specifier: 15.16.3
+    version: 15.16.3(react-dom@18.2.0)(react@18.2.0)
   '@vercel/analytics':
     specifier: 1.0.0
     version: 1.0.0(react@18.2.0)
@@ -18,6 +21,9 @@ dependencies:
     version: 18.2.0(react@18.2.0)
 
 devDependencies:
+  '@contentful/rich-text-types':
+    specifier: 16.0.3
+    version: 16.0.3
   '@types/node':
     specifier: 18.15.13
     version: 18.15.13
@@ -58,10 +64,21 @@ packages:
       regenerator-runtime: 0.13.11
     dev: true
 
+  /@contentful/rich-text-react-renderer@15.16.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-aFtgKn8Yt19qpsez9RdV65/khPhy7GnWXhjhiCMSDVY9vDwyPIPfoKkInt+vePAk7rxlleXds5s7ba6Sm5zKQg==}
+    engines: {node: '>=6.0.0'}
+    peerDependencies:
+      react: ^16.8.6 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.6 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@contentful/rich-text-types': 16.0.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /@contentful/rich-text-types@16.0.3:
     resolution: {integrity: sha512-BsUtXj93jo5XUt0YeUwfCkMWRoZIzJDPUIY4vMy9SwGIO9olTsMoQKadjA2ktlmK+Gg6710WH3eFKZxj2q39Iw==}
     engines: {node: '>=6.0.0'}
-    dev: false
 
   /@eslint-community/eslint-utils@4.4.0(eslint@8.39.0):
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}

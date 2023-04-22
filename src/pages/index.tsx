@@ -1,12 +1,13 @@
 import { createContentfulClient } from "@/lib/create-contentful-client";
-import { Post } from "@/types";
+import { Post, PostEntry } from "@/types";
+import type { BLOCKS } from "@contentful/rich-text-types";
 import { GetStaticProps } from "next";
 
 interface HomeProps {
   posts: Array<Post>;
 }
 
-export default function Page({ posts }: HomeProps) {
+export default function HomePage({ posts }: HomeProps) {
   return (
     <main className="container mx-auto">
       <ul className="flex flex-col gap-2 my-2">
@@ -24,7 +25,7 @@ export default function Page({ posts }: HomeProps) {
 
 export const getStaticProps: GetStaticProps<HomeProps> = async ({ preview }) => {
   const client = createContentfulClient({ preview });
-  const entries = await client.getEntries({
+  const entries = await client.getEntries<PostEntry>({
     content_type: "post",
     select: ["fields.title", "fields.slug", "fields.publishDate"]
   });
@@ -32,9 +33,10 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({ preview }) => 
   const posts: Array<Post> = entries.items.map(({ fields, sys }) => {
     return {
       id: sys.id,
-      slug: (fields.slug as string) || "",
-      title: (fields.title as string) || "",
-      publishDate: (fields.publishDate as string) || ""
+      slug: fields.slug || "",
+      title: fields.title || "",
+      publishDate: fields.publishDate || "",
+      content: { nodeType: "document" as BLOCKS.DOCUMENT, data: {}, content: [] }
     };
   });
 

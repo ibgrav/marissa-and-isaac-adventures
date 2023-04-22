@@ -1,14 +1,20 @@
+import type { Post, PostEntry } from "@/types";
+import type { GetStaticPaths, GetStaticProps } from "next";
+
 import { createContentfulClient } from "@/lib/create-contentful-client";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import { RichText } from "@/components/rich-text";
 
 interface PostProps {
-  title: string;
+  post: Post;
 }
 
-export default function Post({ title }: PostProps) {
+export default function PostPage({ post }: PostProps) {
   return (
     <main>
-      <h1>{title}</h1>
+      <h1>{post.title}</h1>
+      <RichText document={post.content} />
+      <pre>{JSON.stringify(post, null, 2)}</pre>
     </main>
   );
 }
@@ -45,23 +51,23 @@ export const getStaticProps: GetStaticProps<PostProps, PostParams> = async ({ pr
 
   const client = createContentfulClient({ preview });
 
-  const entries = await client.getEntries({
-    content_type: "post",
+  const entries = await client.getEntries<PostEntry>({
+    content_type: "post", //@ts-ignore
     "fields.slug[in]": slug
   });
 
-  const post = entries.items[0];
-  if (!post) return { notFound: true };
-
-  const props: PostProps = {
-    title: ""
-  };
-
-  if (typeof post.fields.title === "string") props.title = post.fields.title;
+  const { fields, sys } = entries.items[0] || {};
+  if (!sys?.id) return { notFound: true };
 
   return {
     props: {
-      title: post.fields.title as string
+      post: {
+        id: sys.id || "",
+        slug: fields.slug || "",
+        title: fields.title || "",
+        publishDate: fields.publishDate || "",
+        content: fields.content || {}
+      }
     }
   };
 };
