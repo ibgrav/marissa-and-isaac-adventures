@@ -10,6 +10,8 @@ interface PostProps {
 }
 
 export default function PostPage({ post }: PostProps) {
+  if (!post?.id) return null;
+
   return (
     <main>
       <h1>{post.title}</h1>
@@ -21,43 +23,40 @@ export default function PostPage({ post }: PostProps) {
 
 type PostParams = { slug: string };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths: Array<{ params: PostParams }> = [];
-
+export const getStaticPaths: GetStaticPaths<PostParams> = async () => {
   const client = createContentfulClient();
+
   const posts = await client.getEntries({
     content_type: "post",
     select: ["fields.slug"],
     order: ["fields.publishDate"]
   });
 
-  posts.items.forEach((post) => {
-    const slug = post.fields.slug;
-    if (slug && typeof slug === "string") {
-      console.log(`getStaticPaths: /post/${slug}`);
-      paths.push({ params: { slug } });
+  const paths: Array<{ params: PostParams }> = [];
+
+  for (const post of posts.items) {
+    if (typeof post.fields.slug === "string") {
+      paths.push({ params: { slug: post.fields.slug } });
     }
-  });
+  }
 
   return {
     paths,
-    fallback: true
+    fallback: "blocking"
   };
 };
 
 export const getStaticProps: GetStaticProps<PostProps, PostParams> = async ({ preview, params }) => {
-  const slug = params?.slug;
-  if (!slug) return { notFound: true };
-
   const client = createContentfulClient({ preview });
 
   const entries = await client.getEntries<PostEntry>({
     content_type: "post", //@ts-ignore
-    "fields.slug[in]": slug
+    "fields.slug[in]": params?.slug
   });
 
-  const { fields, sys } = entries.items[0] || {};
-  if (!sys?.id) return { notFound: true };
+  if (!entries?.items?.[0]?.sys?.id) return { notFound: true };
+
+  const { fields, sys } = entries.items[0];
 
   return {
     props: {
